@@ -1,0 +1,170 @@
+package tg_validation;
+
+import java.util.*;
+
+public class DFA
+{
+	private Transition[][] TT;
+	private char[] inputs;
+	private int IS;
+	private int[] FS;
+	private static String S = null;
+	private static Stack<Transition> backtracking = new Stack<Transition>();
+	private static Stack<ArrayList<Integer>> Paths = new Stack<ArrayList<Integer>>();
+	private static String S2 = "";
+
+	public DFA(int IS, int[] FS, int noOfStates, char[] inputs, Transition[][] TT)
+	{
+	   // Console.Write("Total No. of States = ");
+		//int st = Convert.ToInt32(Console.ReadLine());
+		this.TT = TT;
+	   // Console.Write("Total No. of InitialStates = ");
+		//int st1 = Convert.ToInt32(Console.ReadLine());
+		this.IS = IS;
+
+
+	   // Console.Write("Total No. of FinalStates = ");
+		//int st2 = Convert.ToInt32(Console.ReadLine());
+		this.FS = FS;
+
+		//for (int i = 0; i < st2; i++)
+		//{
+		//    Console.Write("FinalState{0} : ", i + 1);
+		//    FS[i] = Convert.ToInt32(Console.ReadLine());
+		//}
+
+		TT = new Transition[noOfStates][];
+
+	   // Console.Write("Total No. of Inputs = ");
+	   // int ipt = Convert.ToInt32(Console.ReadLine());
+		this.inputs = inputs;
+
+
+
+		//Console.WriteLine();
+
+
+	}
+
+	private ArrayList<Integer> Transition(int state, char inputstr)
+	{
+		ArrayList<Integer> index = new ArrayList<Integer>();
+
+		for (int i = 0; i < TT[state].length; i++)
+		{
+			if (TT[state][i].input == inputstr)
+			{
+				index.add(TT[state][i].state);
+			}
+		}
+
+		return index;
+	}
+
+	//private int MaxlengthTransition(int state)
+	//{
+	//    int temp = 0;
+
+	//    for (int i = 0; i < TT[state].Length; i++)
+	//    {
+	//        if (TT[i].Length > 0)
+	//        {
+	//            temp = 1;//TT[state][i].input.Length;
+	//        }
+	//    }
+
+	//    return temp;
+	//}
+
+	private ArrayList<Integer> Recursion(int t, String str)
+	{
+		if (!str.equals(""))
+		{
+			ArrayList<Integer> temp = new ArrayList<Integer>();
+			temp = Transition(t, str.charAt(0));
+			S = str;
+
+			if (temp.isEmpty())
+			{
+				str = tangible.StringHelper.remove(str, str.length() - 1);
+				temp = Recursion(t, str);
+			}
+
+
+			return temp;
+		}
+		else
+		{
+			return new ArrayList<Integer>();
+		}
+
+	}
+
+	public final boolean Validation(String VerifyString)
+	{
+		S = "";
+		S2 = "";
+		Paths.clear();
+
+		int CurrentState = IS;
+
+		while (S2.length() != VerifyString.length())
+		{
+		E:
+			String verify = VerifyString;
+			verify = tangible.StringHelper.remove(verify, 0, S2.length());
+			int max = TT[CurrentState].length; //axlengthTransition(CurrentState);
+			if (max == 0)
+			{
+				ArrayList<Integer> temp1 = Paths.pop();
+				CurrentState = temp1.get(0);
+				temp1.remove(0);
+				S2 = tangible.StringHelper.remove(S2, S2.length() - 1);
+				Paths.push(temp1);
+//C# TO JAVA CONVERTER TODO TASK: There is no 'goto' in Java:
+				goto E;
+			}
+			if (verify.length() > max)
+			{
+				verify = tangible.StringHelper.remove(verify, max);
+			}
+
+
+			ArrayList<Integer> temp = Recursion(CurrentState, verify);
+			S2 += S;
+
+
+			if (!temp.isEmpty())
+			{
+				CurrentState = temp.get(0);
+				temp.remove(0);
+				if (!temp.isEmpty())
+				{
+					Paths.push(temp);
+				}
+
+			}
+			else
+			{
+				ArrayList<Integer> temp1 = Paths.pop();
+				CurrentState = temp1.get(0);
+				temp1.remove(0);
+				S2 = tangible.StringHelper.remove(S2, S2.length() - 1);
+				Paths.push(temp1);
+			}
+		}
+
+		for (int i = 0; i < FS.length; i++)
+		{
+			if (CurrentState == FS[i])
+			{
+				return true;
+			}
+		}
+
+
+
+		return false;
+	}
+
+}
